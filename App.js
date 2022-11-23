@@ -1,9 +1,20 @@
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, Dimensions , ActivityIndicator } from 'react-native';
+import {Fontisto} from '@expo/vector-icons';
 const { width : SCREEN_WIDTH} = Dimensions.get('window');
 
 const API_KEY = "e7232b50dad2ba903c8a62178e803ed5";
+const icons = {
+  "Clouds": "cloudy",
+  "Clear" : "day-sunny",
+  "Atmosphere" : "cloudy-gusts",
+  "Snow" : "snow",
+  "Rain" : "rains",
+  "Drizzle" : "rain",
+  "Thunderstorm" : "lightning",
+}
+// icons["Clouds"];
 export default function App() {
   const [city, setCity] = useState("Loading...")
   const [days, setDays] = useState([]);
@@ -18,7 +29,7 @@ export default function App() {
     setCity(location[0].region);
     const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}&units=metric&lang=kr`);
     const json = await response.json();
-    // setDays(json.daily);
+    setDays(json.daily);
   };
   useEffect(()=>{
     getWeather();
@@ -42,8 +53,18 @@ export default function App() {
           size="large" 
           />
           </View>
-          ) : ( 
-          <View style={styles.day}></View>
+          ) : (
+            days.map((day, index, ) => 
+            <View key={index} style={{...styles.day, alignItems:"center"}}>
+              <View style={{ flexDirection: "row", alignItems: "center" , width: "100%", justifyContent: "space-between"}}>
+                <Text style={styles.temp}>{parseFloat(day.temp.day).toFixed(1)}</Text>
+                <Fontisto name={icons[day.weather[0].main]} size={68} color="blasck"/>
+              </View>
+              {/* <Text style={styles.description}>{day.weather[0].dt}</Text> */}
+              <Text style={styles.description}>{day.weather[0].main}</Text>
+              <Text style={styles.tinyText}>{day.weather[0].description}</Text>
+            </View>
+            ) 
           )}
       </ScrollView>
     </View>
@@ -63,22 +84,33 @@ const styles = StyleSheet.create({
   cityName: {
     fontSize: 58,
     fontWeight: "500",
+    color: "white",
+
   },
-  weather: {
-  },
+  weather: {},
   day: {
     width: SCREEN_WIDTH,
-    alignItems: "center",
+    alignItems: "flex-start",
+    paddingHorizontal: 20,
+    // alignItems: "center",
   },
   temp: {
     marginTop: 50,
-    fontSize: 178,
+    fontSize: 100,
+    color: "white",
     fontWeight: "600"
   },  
   description: {
-    marginTop:-30,
-    fontSize: 60,
+    marginTop: -10,
+    fontSize: 30,
+    color: "white",
+    fontWeight: "500",
   },
+  tinyText: {
+    marginTop: -5,
+    fontSize: 25,
+    color: "white",
+    fontWeight: "500",  }
 });
 
 // const styles = StyleSheet.create({
